@@ -1,0 +1,43 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: f5-http-app-configmap
+  namespace: default
+  labels:
+    f5type: virtual-server
+    as3: "true"
+data:
+  template: |
+    {
+      "class": "AS3",
+      "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.1.0",
+        "id": "f5-http-app",
+        "label": "CIS AS3 Example",
+        "remark": "Example of using CIS",
+        "kubernetes": {
+          "class": "Tenant",
+          "f5-demo": {
+             "class": "Application",
+             "template": "generic",
+             "ingress_f5": {
+                "class": "Service_TCP",
+                "virtualAddresses": ["10.0.2.102"],
+               "remark":"ingress: f5demo.app.v1",
+
+               "virtualPort": 80,
+                "pool": "ingress_f5"
+             },
+             "ingress_f5": {
+                "class": "Pool",
+                "monitors": [ "tcp" ],
+                "members": [{
+                   "servicePort": 80,
+                   "serverAddresses": []
+                }]
+             }
+            }
+          }
+        }
+    }
